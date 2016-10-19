@@ -1,5 +1,12 @@
 package bastide.domergue.lyra;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
@@ -12,9 +19,13 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, BottomFragment.OnFragmentInteractionListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, BottomFragment.OnFragmentInteractionListener, LocationListener {
 
     private GoogleMap mMap;
+    private LocationManager lm;
+    private final int CODEMAPS = 42;
+    private Criteria criteria;
+    private String bestProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,15 +57,88 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    CODEMAPS);
+            return;
+        }
+       setMarker();
+    }
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CODEMAPS) {
+            for (int i = 0; i < permissions.length; i++) {
+                String permission = permissions[i];
+                int grantResult = grantResults[i];
+
+                if (permission.equals(android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                        setMarker();
+                    } else {
+                        ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
+                                CODEMAPS);
+                    }
+                }
+                if (permission.equals(android.Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                    if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                        setMarker();
+                    } else {
+                       return;
+                    }
+                }
+            }
+        }
+
+    }
+
+    private void setMarker() throws SecurityException {
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        criteria = new Criteria();
+        bestProvider = String.valueOf(lm.getBestProvider(criteria, true));
+        if(location != null){
+            double longitude = location.getLongitude();
+            double latitude = location.getLatitude();
+            LatLng myLatLng = new LatLng(longitude, latitude);
+            mMap.addMarker(new MarkerOptions().position(myLatLng).title("Marker in Sydney"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(myLatLng));
+        } else {
+            lm.requestLocationUpdates(bestProvider, 1000, 0, this);
+        }
+
     }
 
     @Override
     public void onFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        setMarker();
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
 
     }
 }
