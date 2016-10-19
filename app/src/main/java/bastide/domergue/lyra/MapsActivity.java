@@ -1,5 +1,7 @@
 package bastide.domergue.lyra;
 
+import android.support.v4.app.Fragment;
+import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
@@ -10,7 +12,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, BottomFragment.OnFragmentInteractionListener {
 
     private GoogleMap mMap;
 
@@ -22,6 +24,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        // On créer le fragment
+        Fragment bottomFragment = new BottomFragment();
+        // On lui passe les arguments de l'intent qui a déclencher le oncreate
+        bottomFragment.setArguments(getIntent().getExtras());
+        //Ajout du fragment au layout
+        getSupportFragmentManager().beginTransaction().add(R.id.map, bottomFragment).commit();
+
     }
 
 
@@ -42,5 +51,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }

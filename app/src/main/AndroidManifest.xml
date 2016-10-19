@@ -43,11 +43,7 @@
 
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="bastide.domergue.lyra.LoginActivity" />
-        </activity>
+            android:label="@string/title_activity_maps"></activity>
     </application>
 
 </manifest>
