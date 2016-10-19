@@ -105,11 +105,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         criteria = new Criteria();
         bestProvider = String.valueOf(lm.getBestProvider(criteria, true));
+        lm.requestLocationUpdates(bestProvider, 1000, 0, this);
         if(location != null){
+            mMap.clear();
             double longitude = location.getLongitude();
             double latitude = location.getLatitude();
             LatLng myLatLng = new LatLng(longitude, latitude);
-            mMap.addMarker(new MarkerOptions().position(myLatLng).title("Marker in Sydney"));
+            mMap.addMarker(new MarkerOptions().position(myLatLng).title(getResources().getString(R.string.yourPosition)));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(myLatLng));
         } else {
             lm.requestLocationUpdates(bestProvider, 1000, 0, this);

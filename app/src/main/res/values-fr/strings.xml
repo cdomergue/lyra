@@ -12,4 +12,5 @@
     <string name="prompt_email">E-mail</string>
     <string name="prompt_password">Mot de passe (optionnel)</string>
     <string name="title_activity_maps">Carte</string>
+    <string name="yourPosition">Votre position actuelle</string>
 </resources>
