@@ -18,8 +18,13 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, BottomFragment.OnFragmentInteractionListener, LocationListener {
 
@@ -28,8 +33,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private final int CODEMAPS = 42;
     private Criteria criteria;
     private String bestProvider;
-    private double longitude;
-    private double latitude;
+    private LatLng latLng = new LatLng(0,0);
+    private Map<LatLng, String> messages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +50,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         bottomFragment.setArguments(getIntent().getExtras());
         //Ajout du fragment au layout
         getSupportFragmentManager().beginTransaction().add(R.id.map, bottomFragment).commit();
-
+        //Création de la liste des messages
+        messages = new HashMap<>();
     }
 
 
@@ -112,15 +118,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         lm.requestLocationUpdates(bestProvider, 1000, 0, this);
         if(location != null){
             mMap.clear();
-            longitude = location.getLongitude();
-            latitude = location.getLatitude();
-            LatLng myLatLng = new LatLng(longitude, latitude);
-            mMap.addMarker(new MarkerOptions().position(myLatLng).title(getResources().getString(R.string.yourPosition)));
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(myLatLng));
+            latLng = new LatLng(location.getLatitude(), location.getLongitude());
+           // mMap.addMarker(new MarkerOptions().position(latLng).title(getResources().getString(R.string.yourPosition)));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            for (Map.Entry<LatLng, String> entry : messages.entrySet())
+            {
+                mMap.addMarker(new MarkerOptions().position(entry.getKey()).title(entry.getValue()));
+            }
         } else {
             lm.requestLocationUpdates(bestProvider, 1000, 0, this);
         }
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(getIntent().getExtras() != null){
+            double longitude = getIntent().getExtras().getDouble("longitude");
+            double latitude = getIntent().getExtras().getDouble("latitude");
+            String message = getIntent().getExtras().getString("message");
+            messages.put(new LatLng(latitude, longitude), message);
+        }
     }
 
     @Override
@@ -151,7 +170,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void addMessage(View view) {
         Intent nextActivity = new Intent(getApplicationContext(), AddMessageActivity.class);
         //On envoi les coordonnées dans la prochaine activité pour l'ajout du message
-        nextActivity.putExtra("longitude", longitude).putExtra("latitude", latitude);
+        nextActivity.putExtra("longitude", latLng.longitude).putExtra("latitude", latLng.latitude);
         //On lance l'activité d'envoi de message
         startActivity(nextActivity);
     }
