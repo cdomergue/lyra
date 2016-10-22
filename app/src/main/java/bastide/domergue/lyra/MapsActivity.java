@@ -1,6 +1,7 @@
 package bastide.domergue.lyra;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -11,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.View;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -26,6 +28,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private final int CODEMAPS = 42;
     private Criteria criteria;
     private String bestProvider;
+    private double longitude;
+    private double latitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,8 +112,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         lm.requestLocationUpdates(bestProvider, 1000, 0, this);
         if(location != null){
             mMap.clear();
-            double longitude = location.getLongitude();
-            double latitude = location.getLatitude();
+            longitude = location.getLongitude();
+            latitude = location.getLatitude();
             LatLng myLatLng = new LatLng(longitude, latitude);
             mMap.addMarker(new MarkerOptions().position(myLatLng).title(getResources().getString(R.string.yourPosition)));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(myLatLng));
@@ -142,5 +146,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    public void addMessage(View view) {
+        Intent nextActivity = new Intent(getApplicationContext(), AddMessageActivity.class);
+        //On envoi les coordonnées dans la prochaine activité pour l'ajout du message
+        nextActivity.putExtra("longitude", longitude).putExtra("latitude", latitude);
+        //On lance l'activité d'envoi de message
+        startActivity(nextActivity);
     }
 }
