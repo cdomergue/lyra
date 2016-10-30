@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -26,6 +27,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static bastide.domergue.lyra.MessagesContentProvider.*;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, BottomFragment.OnFragmentInteractionListener, LocationListener {
 
@@ -115,6 +118,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void setMarker() throws SecurityException {
+        MessagesContentProvider messagesContentProvider = new MessagesContentProvider();
+        Cursor cursor = messagesContentProvider.query(Uri.parse("content://fr.esiea.lyra"),
+                new String[] { KEY_POSITION_X, KEY_POSITION_Y,
+                KEY_MESSAGE }, null, null, null);
         Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         criteria = new Criteria();
         bestProvider = String.valueOf(lm.getBestProvider(criteria, true));
@@ -124,9 +131,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             latLng = new LatLng(location.getLatitude(), location.getLongitude());
            // mMap.addMarker(new MarkerOptions().position(latLng).title(getResources().getString(R.string.yourPosition)));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            for (Map.Entry<LatLng, String> entry : messages.entrySet())
-            {
-                mMap.addMarker(new MarkerOptions().position(entry.getKey()).title(entry.getValue()));
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                mMap.addMarker(new MarkerOptions().position(new LatLng(cursor.getDouble(cursor.getColumnIndex("key_position_y")), cursor.getDouble(cursor.getColumnIndex("key_position_x")))).title(cursor.getString(cursor.getColumnIndex("key_message"))));
+                cursor.moveToNext();
             }
         } else {
             lm.requestLocationUpdates(bestProvider, 1000, 0, this);
@@ -141,7 +149,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             double longitude = getIntent().getExtras().getDouble("longitude");
             double latitude = getIntent().getExtras().getDouble("latitude");
             String message = getIntent().getExtras().getString("message");
-            messages.put(new LatLng(latitude, longitude), message);
             ContentValues contentValues = new ContentValues();
             contentValues.put("key_position_x", longitude);
             contentValues.put("key_position_y", latitude);

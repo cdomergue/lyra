@@ -64,6 +64,11 @@ public class MessagesContentProvider extends ContentProvider{
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        myMessagesHelper = new MessagesDBHelper(
+                MapsActivity.context,
+                MessagesDBHelper.DATABASE_NAME,
+                null,
+                MessagesDBHelper.DATABASE_VERSION);
         //ouverture de la base de donnée
         SQLiteDatabase db = myMessagesHelper.getWritableDatabase();
 
@@ -177,14 +182,14 @@ public class MessagesContentProvider extends ContentProvider{
     }
 
 
-    private class MessagesDBHelper extends SQLiteOpenHelper {
+    public class MessagesDBHelper extends SQLiteOpenHelper {
 
         // nom de la base de données
-        private static final String DATABASE_NAME = "lyraDatabase";
+        public static final String DATABASE_NAME = "lyraDatabase";
         // nom de la table
-        private static final String DATABASE_TABLE = "Messages";
+        public static final String DATABASE_TABLE = "Messages";
         // version de la base de données
-        private static final int DATABASE_VERSION = 1;
+        public static final int DATABASE_VERSION = 1;
 
         // script de création de la base de donnée
         private static final String DATABASE_CREATE = "create table " +
