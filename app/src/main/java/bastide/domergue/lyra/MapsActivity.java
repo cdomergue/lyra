@@ -1,5 +1,6 @@
 package bastide.domergue.lyra;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -35,6 +36,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String bestProvider;
     private LatLng latLng = new LatLng(0,0);
     private Map<LatLng, String> messages;
+    public static Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +54,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         getSupportFragmentManager().beginTransaction().add(R.id.map, bottomFragment).commit();
         //Création de la liste des messages
         messages = new HashMap<>();
+        MapsActivity.context = getApplicationContext();
     }
 
 
@@ -139,6 +142,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             double latitude = getIntent().getExtras().getDouble("latitude");
             String message = getIntent().getExtras().getString("message");
             messages.put(new LatLng(latitude, longitude), message);
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("key_position_x", longitude);
+            contentValues.put("key_position_y", latitude);
+            contentValues.put("key_message", message);
+            MessagesContentProvider messagesContentProvider = new MessagesContentProvider();
+            messagesContentProvider.insert(Uri.parse("content://fr.esiea.lyra"), contentValues);
         }
     }
 

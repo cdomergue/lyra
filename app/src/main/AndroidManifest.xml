@@ -45,6 +45,11 @@
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" />
         <activity android:name=".AddMessageActivity"></activity>
+        <provider
+            android:name="MessagesContentProvider"
+            android:authorities="fr.esiea.lyra"
+            android:enabled="true"
+            android:exported="true"></provider>
     </application>
 
 </manifest>
