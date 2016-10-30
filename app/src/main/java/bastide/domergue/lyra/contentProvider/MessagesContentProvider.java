@@ -1,4 +1,4 @@
-package bastide.domergue.lyra;
+package bastide.domergue.lyra.contentProvider;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -12,6 +12,8 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
+
+import bastide.domergue.lyra.activity.MapsActivity;
 
 /**
  * Created by Franck on 29/10/2016.

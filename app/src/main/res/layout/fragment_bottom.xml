@@ -4,7 +4,7 @@
     android:id="@+id/fBottom"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="bastide.domergue.lyra.BottomFragment">
+    tools:context="bastide.domergue.lyra.fragment.BottomFragment">
 
     <!-- TODO: Update blank fragment layout -->
 

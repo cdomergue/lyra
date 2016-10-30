@@ -1,4 +1,4 @@
-package bastide.domergue.lyra;
+package bastide.domergue.lyra.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -33,6 +33,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import bastide.domergue.lyra.R;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
